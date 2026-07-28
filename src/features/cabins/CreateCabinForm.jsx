@@ -9,10 +9,10 @@ import { useCreateCabin } from './useCreateCabin';
 import { useEditCabin } from './useEditCabin';
 
 function CreateCabinForm({ cabinToEdit = {} }) {
-  const { id: editId, image: editImage, ...editValues } = cabinToEdit;
+  const { id: editId, ...editValues } = cabinToEdit;
   const isEditSession = Boolean(editId);
   const { register, handleSubmit, reset, getValues, formState } = useForm({
-    defaultValues: isEditSession ? { image: editImage, ...editValues } : {},
+    defaultValues: isEditSession ? { ...editValues } : {},
   });
   const { errors } = formState;
   const { createCabin, isCreating } = useCreateCabin();
@@ -21,17 +21,11 @@ function CreateCabinForm({ cabinToEdit = {} }) {
 
   function onSubmit(data) {
     const image = typeof data.image === 'string' ? data.image : data.image[0];
+
     if (isEditSession) {
-      editCabin(
-        {
-          newCabinData: { ...data, image },
-          id: editId,
-          editImage: editImage.split('/').at(-1),
-        },
-        { onSuccess: () => reset() },
-      );
+      editCabin({ newCabin: { ...data, image }, id: editId }, { onSuccess: () => reset() });
     } else {
-      createCabin({ ...data, image }, { onSuccess: () => reset() });
+      createCabin({ newCabin: { ...data, image } }, { onSuccess: () => reset() });
     }
   }
 
